@@ -1,0 +1,13 @@
+{
+  "name": "codm-scarapper",
+  "version": "1.0.0",
+  "description": "Scrapper for https://main.codm.garena.co.id/guide/weapons",
+  "main": "./index.js",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.2"
+  }
+}
