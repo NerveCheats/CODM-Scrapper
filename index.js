@@ -1,5 +1,13 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
+const fs = require('fs');
+
+const dataToJsonFile = (data) => {
+   fs.writeFile("data.json", data, "binary", (err) => {
+      if (err) throw err;
+      console.log("Data saved in data.json");
+   });
+}
 
 const getCategory = () => {
    return new Promise((resolve, reject) => {
@@ -53,8 +61,7 @@ const getWeapon = (weaponCategory, weaponType) => {
                if (data == undefined) {
                   reject("No result :(");
                } else {
-                  var result = JSON.stringify(data, null, 2);
-                  resolve(result);
+                  resolve(data);
                }
 
             };
@@ -62,17 +69,30 @@ const getWeapon = (weaponCategory, weaponType) => {
    });
 };
 
-getCategory().then(data => {
-   data.forEach(e => {
-      const category = e.replace(" ", "_").toLowerCase();
-      console.info("Weapon Category : ", e);
+function jsonConcat(o1, o2) {
+   for (var key in o2) {
+      o1[key] = o2[key];
+   }
+   return o1;
+}
 
-      getWeapon(e, category).then(weapon => {
-         console.log(weapon);
-      }, errs => {
-         console.error(errs);
-      })
-   })
-}, err => {
-   console.error(err);
-});
+async function main() {
+   const data = await getCategory();
+   var output = {};
+
+   for (const key in data) {
+      if (Object.hasOwnProperty.call(data, key)) {
+         const element = data[key];
+
+         const category = element.replace(" ", "_").toLowerCase();
+         console.info("Weapon Category : ", element);
+         const weapon = await getWeapon(element, category);
+         output = jsonConcat(output, weapon);
+      }
+   }
+
+   var result = JSON.stringify(output, null, 2);
+   dataToJsonFile(result);
+}
+
+main();
